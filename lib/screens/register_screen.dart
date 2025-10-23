@@ -1,12 +1,13 @@
-// lib/screens/login_screen.dart
+// lib/screens/register_screen.dart
 
 import 'package:flutter/material.dart';
-import '../widgets/user_icon.dart'; // Importa el icono
-import '../widgets/login_form.dart'; // Importa el formulario
-import '../viewmodels/login_viewmodel.dart'; // Importa el ViewModel
+import 'package:provider/provider.dart';
+import '../widgets/user_icon.dart'; // Reutilizamos el mismo icono
+import '../widgets/register_form.dart'; // Importa el formulario de registro
+import '../viewmodels/register_viewmodel.dart'; // Importa el ViewModel de registro
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class RegisterScreen extends StatelessWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +19,11 @@ class LoginPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              // Widget del Icono de usuario
-              const UserIcon(),
+              const UserIcon(), // Reutilizamos el UserIcon
               const SizedBox(height: 48.0),
 
-              // Texto de bienvenida
               Text(
-                'Bienvenido a PREFIS',
+                'Registrar Usuario',
                 style: TextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.bold,
@@ -33,8 +32,8 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 32.0),
 
-              // Widget del Formulario de inicio de sesión
-              const LoginForm(),
+              // Usa el formulario de registro
+              const RegisterForm(),
             ],
           ),
         ),

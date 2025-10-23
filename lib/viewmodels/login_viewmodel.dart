@@ -1,5 +1,3 @@
-// lib/viewmodels/login_viewmodel.dart
-
 import 'package:flutter/material.dart';
 
 // 1. Un ChangeNotifier es lo que 'Provider' observa para notificar cambios.
@@ -38,8 +36,8 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   // Lógica de registro
-  void goToRegister() {
+  void goToRegister(BuildContext context) {
     print("Navegando a la pantalla de Registro...");
-    // Lógica de navegación para ir a la pantalla de registro
+    Navigator.of(context).pushNamed('/register'); // Navega usando la ruta definida en main.dart
   }
 }

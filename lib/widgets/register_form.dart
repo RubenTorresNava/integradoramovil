@@ -1,25 +1,46 @@
-// lib/widgets/login_form.dart
+// lib/widgets/register_form.dart
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodels/login_viewmodel.dart';
+import '../viewmodels/register_viewmodel.dart';
 
-class LoginForm extends StatelessWidget {
-  const LoginForm({Key? key}) : super(key: key);
+class RegisterForm extends StatelessWidget {
+  const RegisterForm({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // 1. Obtener acceso al ViewModel (la lógica)
-    // El widget se reconstruirá cada vez que el ViewModel llame a notifyListeners()
-    final viewModel = Provider.of<LoginViewModel>(context);
+    final viewModel = Provider.of<RegisterViewModel>(context);
 
-    // Controladores de texto. Se definen aquí ya que son necesarios solo para este widget.
-    // El estado de lo que escriben queda en el TextField, pero el valor se pasa al ViewModel al presionar el botón.
+    final TextEditingController nameController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
+    final TextEditingController confirmPasswordController = TextEditingController();
 
     return Column(
       children: <Widget>[
+        // Campo de Nombre
+        TextField(
+          controller: nameController,
+          keyboardType: TextInputType.name,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[200],
+            prefixIcon: const Icon(Icons.person, color: Colors.black54),
+            hintText: 'Nombre',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: const BorderSide(color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
+            ),
+            contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+          ),
+          style: const TextStyle(color: Colors.black87),
+        ),
+        const SizedBox(height: 16.0),
+
         // Campo de Correo
         TextField(
           controller: emailController,
@@ -64,6 +85,29 @@ class LoginForm extends StatelessWidget {
           ),
           style: const TextStyle(color: Colors.black87),
         ),
+        const SizedBox(height: 16.0),
+
+        // Campo de Confirmar Contraseña
+        TextField(
+          controller: confirmPasswordController,
+          obscureText: true,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[200],
+            prefixIcon: const Icon(Icons.lock, color: Colors.black54),
+            hintText: 'Confirmar Contraseña',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: const BorderSide(color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
+            ),
+            contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+          ),
+          style: const TextStyle(color: Colors.black87),
+        ),
 
         // Mensaje de Error
         if (viewModel.errorMessage != null)
@@ -83,14 +127,14 @@ class LoginForm extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: ElevatedButton(
-                // 2. Lógica del botón: Si está cargando, es null (deshabilitado)
                 onPressed: viewModel.isLoading
                     ? null
                     : () {
-                  // Llama a la función signIn del ViewModel, pasando los datos del formulario
-                  viewModel.signIn(
+                  viewModel.register(
+                    nameController.text,
                     emailController.text,
                     passwordController.text,
+                    confirmPasswordController.text,
                     context,
                   );
                 },
@@ -103,22 +147,21 @@ class LoginForm extends StatelessWidget {
                 ),
                 child: viewModel.isLoading
                     ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                ) // Muestra el spinner de carga
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                )
                     : const Text(
-                  'Iniciar sesión',
+                  'Registrarse',
                   style: TextStyle(fontSize: 18.0, color: Colors.white),
                 ),
               ),
             ),
             const SizedBox(width: 16.0),
             TextButton(
-              // 3. Lógica del botón Registrarse
-              onPressed: viewModel.isLoading ? null : () => viewModel.goToRegister(context),
+              onPressed: viewModel.isLoading ? null : () => viewModel.goToLogin(context),
               child: Text(
-                'Registrarse',
+                'Iniciar Sesión',
                 style: TextStyle(
                   fontSize: 16.0,
                   color: Colors.grey[700],
