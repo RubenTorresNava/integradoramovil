@@ -1,10 +1,6 @@
-// lib/screens/register_screen.dart
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../widgets/user_icon.dart'; // Reutilizamos el mismo icono
-import '../widgets/register_form.dart'; // Importa el formulario de registro
-import '../viewmodels/register_viewmodel.dart'; // Importa el ViewModel de registro
+import '../widgets/user_icon.dart';
+import '../widgets/register_form.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({Key? key}) : super(key: key);

@@ -1,9 +1,6 @@
-// lib/screens/login_screen.dart
-
 import 'package:flutter/material.dart';
-import '../widgets/user_icon.dart'; // Importa el icono
-import '../widgets/login_form.dart'; // Importa el formulario
-import '../viewmodels/login_viewmodel.dart'; // Importa el ViewModel
+import '../widgets/user_icon.dart';
+import '../widgets/login_form.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);

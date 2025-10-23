@@ -1,5 +1,3 @@
-// lib/main.dart (MODIFICADO)
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/login_screen.dart';
