@@ -1,5 +1,3 @@
-// lib/screens/home_screen.dart (MUCHO MÁS LIMPIO)
-
 import 'package:flutter/material.dart';
 import '../widgets/custom_drawer.dart';
 import '../widgets/predictor_input_panel.dart';
@@ -38,14 +36,12 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
       ),
       drawer: const CustomDrawer(),
-      // Usamos el Consumer/Provider a nivel del widget de input, no aquí
       body: LayoutBuilder(
         builder: (context, constraints) {
           // Diseño para Tablet/Web
           if (constraints.maxWidth > 800) {
             return Row(
               children: <Widget>[
-                // Widget que contiene TODO el input y resultado
                 const SizedBox(
                   width: 420,
                   child: PredictorInputPanel(primaryColor: primaryColor),
@@ -56,10 +52,8 @@ class HomeScreen extends StatelessWidget {
               ],
             );
           } else {
-            // Diseño para Móvil
             return Column(
               children: <Widget>[
-                // Widget que contiene TODO el input y resultado
                 PredictorInputPanel(primaryColor: primaryColor),
                 Expanded(
                   child: _buildGraphArea(),
