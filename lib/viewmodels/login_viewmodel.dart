@@ -22,9 +22,7 @@ class LoginViewModel extends ChangeNotifier {
       // 3. Lógica de éxito: Navegación, etc.
       print("Login exitoso!");
 
-      // Puedes navegar a otra pantalla aquí.
-      // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
-
+      Navigator.of(context).pushReplacementNamed('/home');
     } else {
       // 4. Lógica de error
       _errorMessage = 'Correo o contraseña incorrectos.';

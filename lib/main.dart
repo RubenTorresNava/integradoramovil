@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/home_screen.dart';
 import 'viewmodels/login_viewmodel.dart';
 import 'viewmodels/register_viewmodel.dart';
+import 'viewmodels/sif_predictor_viewmodel.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,21 +16,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Usamos MultiProvider para manejar múltiples ViewModels/Providers
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LoginViewModel()),
         ChangeNotifierProvider(create: (context) => RegisterViewModel()),
+        ChangeNotifierProvider(create: (context) => SifPredictorViewModel()),
       ],
       child: MaterialApp(
-        title: 'PREFIS App',
+        title: 'PREFIS SIF Predictor',
         theme: ThemeData(
+          primarySwatch: Colors.purple,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        initialRoute: '/', // Define la ruta inicial
+        initialRoute: '/',
         routes: {
-          '/': (context) => const LoginPage(), // Ruta para la pantalla de Login
-          '/register': (context) => const RegisterScreen(), // Ruta para la pantalla de Registro
+          '/': (context) => const LoginPage(),
+          '/register': (context) => const RegisterScreen(),
+          '/home': (context) => const HomeScreen(),
         },
       ),
     );
