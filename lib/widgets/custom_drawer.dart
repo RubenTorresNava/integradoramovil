@@ -33,9 +33,10 @@ class CustomDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.history, color: Colors.white70),
             title: const Text('Historial', style: TextStyle(color: Colors.white70)),
+            tileColor: ModalRoute.of(context)?.settings.name == '/history' ? Colors.purple[800] : null,
             onTap: () {
-              // Lógica de navegación a Historial
-              Navigator.pop(context);
+              Navigator.pop(context); // Cierra el drawer
+              Navigator.of(context).pushNamed('/history'); // Navega a la pantalla
             },
           ),
           ListTile(
