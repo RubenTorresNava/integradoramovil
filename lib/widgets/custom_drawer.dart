@@ -22,8 +22,13 @@ class CustomDrawer extends StatelessWidget {
           // Lista de elementos de navegación
           ListTile(
             leading: const Icon(Icons.add, color: Colors.white, size: 30),
-            title: const Text('Inicio', style: TextStyle(color: Colors.white)),
-            tileColor: const Color.fromRGBO(104, 36, 68, 1), // Fondo morado para el elemento activo
+            title: Text(
+              'Inicio',
+              style: TextStyle(
+                color: ModalRoute.of(context)?.settings.name == '/home' ? Colors.white : Colors.white70,
+                fontWeight: ModalRoute.of(context)?.settings.name == '/home' ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
             onTap: () {
               // Lógica de navegación a Inicio (ya estamos aquí, se puede cerrar el drawer)
               Navigator.pop(context);
@@ -32,8 +37,13 @@ class CustomDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.history, color: Colors.white70),
-            title: const Text('Historial', style: TextStyle(color: Colors.white70)),
-            tileColor: ModalRoute.of(context)?.settings.name == '/history' ? Colors.purple[800] : null,
+            title: Text(
+              'Historial',
+              style: TextStyle(
+                color: ModalRoute.of(context)?.settings.name == '/history' ? Colors.white : Colors.white70,
+                fontWeight: ModalRoute.of(context)?.settings.name == '/history' ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
             onTap: () {
               Navigator.pop(context); // Cierra el drawer
               Navigator.of(context).pushNamed('/history'); // Navega a la pantalla
@@ -41,8 +51,13 @@ class CustomDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.auto_stories, color: Colors.white70),
-            title: const Text('Recursos', style: TextStyle(color: Colors.white70)),
-            tileColor: ModalRoute.of(context)?.settings.name == '/resources' ? Colors.purple[800] : null, // Opcional: Resaltar si está activo
+            title: Text(
+              'Recursos',
+              style: TextStyle(
+                color: ModalRoute.of(context)?.settings.name == '/resources' ? Colors.white : Colors.white70,
+                fontWeight: ModalRoute.of(context)?.settings.name == '/resources' ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
             onTap: () {
               // Lógica para navegar a Recursos
               Navigator.pop(context); // Cierra el drawer
