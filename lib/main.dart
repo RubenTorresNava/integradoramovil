@@ -3,9 +3,11 @@ import 'package:provider/provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/resources_screen.dart';
 import 'viewmodels/login_viewmodel.dart';
 import 'viewmodels/register_viewmodel.dart';
 import 'viewmodels/sif_predictor_viewmodel.dart';
+import 'viewmodels/resources_viewmodel.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,6 +23,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => LoginViewModel()),
         ChangeNotifierProvider(create: (context) => RegisterViewModel()),
         ChangeNotifierProvider(create: (context) => SifPredictorViewModel()),
+        ChangeNotifierProvider(create: (context) => ResourcesViewModel()),
       ],
       child: MaterialApp(
         title: 'PREFIS SIF Predictor',
@@ -33,6 +36,7 @@ class MyApp extends StatelessWidget {
           '/': (context) => const LoginPage(),
           '/register': (context) => const RegisterScreen(),
           '/home': (context) => const HomeScreen(),
+          '/resources': (context) => const ResourcesScreen(),
         },
       ),
     );

@@ -27,6 +27,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               // Lógica de navegación a Inicio (ya estamos aquí, se puede cerrar el drawer)
               Navigator.pop(context);
+              Navigator.of(context).pushNamed('/home');
             },
           ),
           ListTile(
@@ -40,9 +41,11 @@ class CustomDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.auto_stories, color: Colors.white70),
             title: const Text('Recursos', style: TextStyle(color: Colors.white70)),
+            tileColor: ModalRoute.of(context)?.settings.name == '/resources' ? Colors.purple[800] : null, // Opcional: Resaltar si está activo
             onTap: () {
-              // Lógica de navegación a Recursos
-              Navigator.pop(context);
+              // Lógica para navegar a Recursos
+              Navigator.pop(context); // Cierra el drawer
+              Navigator.of(context).pushNamed('/resources'); // Navega a la pantalla
             },
           ),
 
