@@ -56,7 +56,7 @@ class ResultOutputPanel extends StatelessWidget {
                   style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),
                 Text(
-                  '${viewModel.sifResult!.toStringAsFixed(2)} MPa',
+                  '${viewModel.sifResult!.toString()} MPa',
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 36,

@@ -18,7 +18,7 @@ class LoginViewModel extends ChangeNotifier {
     // **AQUÍ VA LA LÓGICA PESADA (LLAMADAS A LA API)**
     await Future.delayed(const Duration(seconds: 2)); // Simula una llamada a la red
 
-    if (email == 'test@prefis.com' && password == '12345') {
+    if (email == 'a' && password == 'a') {
       // 3. Lógica de éxito: Navegación, etc.
       print("Login exitoso!");
 

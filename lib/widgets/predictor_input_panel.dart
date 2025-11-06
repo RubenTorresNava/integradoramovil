@@ -53,7 +53,7 @@ class PredictorInputPanel extends StatelessWidget {
                 InputActionButton(
                   icon: Icons.add,
                   color: primaryColor,
-                  onPressed: () => print('Agregar nueva configuración'),
+                  onPressed: viewModel.addEntry,
                 ),
                 const SizedBox(width: 8),
 
@@ -77,6 +77,13 @@ class PredictorInputPanel extends StatelessWidget {
                 ),
               ],
             ),
+            
+            // Widget para mostrar las entradas agregadas
+            if (viewModel.inputs.isNotEmpty) ...[
+              const Divider(height: 30),
+              _buildEntriesList(viewModel),
+            ],
+
             const SizedBox(height: 20),
 
             // Resultado
@@ -84,6 +91,22 @@ class PredictorInputPanel extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  // Widget para mostrar la lista de entradas como Chips
+  Widget _buildEntriesList(SifPredictorViewModel viewModel) {
+    return Wrap(
+      spacing: 8.0,
+      runSpacing: 4.0,
+      children: viewModel.inputs.map((input) {
+        return Chip(
+          label: Text('${input.shape} - ${input.size} mm'),
+          backgroundColor: Colors.grey.shade200,
+          onDeleted: () => viewModel.removeEntry(input.id),
+          deleteIconColor: Colors.red.shade400,
+        );
+      }).toList(),
     );
   }
 
@@ -98,7 +121,7 @@ class PredictorInputPanel extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         onPressed: () {
-          final options = ['Recta', 'Curva', 'Mixta'];
+          final options = ['Rectangular'];
           showModalBottomSheet(
             context: context,
             builder: (ctx) => SafeArea(
