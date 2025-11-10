@@ -1,5 +1,3 @@
-// lib/widgets/crack_input_row.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/sif_predictor_viewmodel.dart';
@@ -21,10 +19,8 @@ class CrackInputRow extends StatelessWidget {
     final TextEditingController sizeController = TextEditingController(
         text: crackInput.size?.toString() ?? '');
 
-    // Se usa Consumer para reconstruir solo la fila cuando la forma cambia (por el modal)
     return Consumer<SifPredictorViewModel>(
       builder: (context, vm, child) {
-        // Asegura que el controlador esté actualizado si la data cambia externamente
         if (crackInput.size?.toString() != sizeController.text && !sizeController.text.contains('.')) {
           sizeController.text = crackInput.size?.toString() ?? '';
           sizeController.selection = TextSelection.fromPosition(TextPosition(offset: sizeController.text.length));
@@ -33,22 +29,45 @@ class CrackInputRow extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // 1. Botón 'Forma de grieta'
+              // Columna principal para Inputs y Resultado
               Expanded(
-                flex: 3,
-                child: _buildShapeSelectorButton(context, viewModel),
+                flex: 5,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        //  Botón 'Forma de grieta'
+                        Expanded(child: _buildShapeSelectorButton(context, viewModel)),
+                        const SizedBox(width: 8),
+
+                        // Campo de entrada 'Tamaño (mm)'
+                        Expanded(child: _buildCrackSizeInput(viewModel, sizeController)),
+                      ],
+                    ),
+
+                    // Resultado de SIF
+                    if (crackInput.result != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4.0),
+                        child: Text(
+                          'Resultado: ${crackInput.result}',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
+
               const SizedBox(width: 8),
 
-              // 2. Campo de entrada 'Tamaño (mm)'
-              Expanded(
-                flex: 2,
-                child: _buildCrackSizeInput(viewModel, sizeController),
-              ),
-              const SizedBox(width: 8),
-
-              // 3. Botón para eliminar la fila
+              //Botón para eliminar la fila
               SizedBox(
                 height: 48,
                 width: 48,
@@ -70,6 +89,7 @@ class CrackInputRow extends StatelessWidget {
     );
   }
 
+  // Helper para el selector de forma (Modal Bottom Sheet)
   Widget _buildShapeSelectorButton(BuildContext context, SifPredictorViewModel viewModel) {
     return SizedBox(
       height: 48,
@@ -80,7 +100,7 @@ class CrackInputRow extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         onPressed: () {
-          final options = ['Recta', 'Curva', 'Mixta'];
+          final options = ['Rectangular'];
           showModalBottomSheet(
             context: context,
             builder: (ctx) => SafeArea(
@@ -109,6 +129,7 @@ class CrackInputRow extends StatelessWidget {
     );
   }
 
+  // Helper para el campo de texto de tamaño
   Widget _buildCrackSizeInput(SifPredictorViewModel viewModel, TextEditingController controller) {
     return SizedBox(
       height: 48,
@@ -125,7 +146,7 @@ class CrackInputRow extends StatelessWidget {
         ),
         onChanged: (value) {
           double? size = double.tryParse(value);
-          viewModel.setCrackSize(crackInput.id, size ?? 0.0);
+          viewModel.setCrackSize(crackInput.id, size);
         },
       ),
     );

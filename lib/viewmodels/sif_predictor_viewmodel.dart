@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class CrackInput {
   String id = UniqueKey().toString();
   String? shape;
   double? size;
-  double? result;
+  String? result; // Resultado SIF individual (String formateado con ' MPa')
 
   CrackInput({this.shape, this.size, this.result});
 }
 
 class SifPredictorViewModel extends ChangeNotifier {
+  // --- CONSTANTE: URL DE TU API ---
+  final String _apiUrl = 'http://192.168.1.6:5000/predict';
+
+  // --- ESTADO ---
   final List<CrackInput> _crackInputs = [CrackInput()];
 
   double? _sifResult;
@@ -17,13 +23,14 @@ class SifPredictorViewModel extends ChangeNotifier {
   String? _errorMessage;
   int _selectedTabIndex = 0;
 
-  // Getters
+  // --- GETTERS ---
   List<CrackInput> get crackInputs => _crackInputs;
   double? get sifResult => _sifResult;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   int get selectedTabIndex => _selectedTabIndex;
 
+  // --- MÉTODOS DE MANEJO DE INPUTS ---
 
   void addCrackInput() {
     _crackInputs.add(CrackInput());
@@ -44,9 +51,8 @@ class SifPredictorViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setCrackSize(String id, double size) {
+  void setCrackSize(String id, double? size) {
     _crackInputs.firstWhere((input) => input.id == id).size = size;
-    notifyListeners();
   }
 
   void selectTab(int index) {
@@ -54,10 +60,18 @@ class SifPredictorViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- LÓGICA DE CÁLCULO MÚLTIPLE ---
+  void clearInput() {
+    _crackInputs.clear();
+    _crackInputs.add(CrackInput());
+    _sifResult = null;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  // --- LÓGICA DE CONEXIÓN A LA API ---
 
   Future<void> calculateSIF() async {
-    // 1. Validaciones
+    // Validaciones
     if (_crackInputs.any((input) => input.size == null || input.size! <= 0 || input.shape == null)) {
       _errorMessage = 'Asegúrate de que todos los campos (Forma y Tamaño) estén llenos y sean válidos.';
       _sifResult = null;
@@ -68,33 +82,61 @@ class SifPredictorViewModel extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     _sifResult = null;
+
+    // Limpiar resultados anteriores en la lista
+    for (var input in _crackInputs) {
+      input.result = null;
+    }
     notifyListeners();
 
-    // Simulación de API call
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // Preparar los datos
+      final features = _crackInputs.map((input) => input.size).toList();
+      final body = jsonEncode({'features': features});
+      final url = Uri.parse(_apiUrl);
 
-    double totalSIF = 0;
+      // Petición HTTP POST
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      ).timeout(const Duration(seconds: 10));
 
-    for (var input in _crackInputs) {
-      // Simular cálculo individual por grieta
-      double individualSIF = 800.0 + (input.size! * 5.0);
-      input.result = individualSIF;
-      totalSIF += individualSIF;
+      // 4. Procesar la Respuesta
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> predictions = data['predictions'];
+
+        // Asignar resultados individuales
+        for (int i = 0; i < predictions.length; i++) {
+          if (i < _crackInputs.length) {
+            // Se asume que predictions[i] contiene el valor numérico
+            final double sifValue = (predictions[i][0] as num).toDouble();
+
+            // Almacenar el resultado formateado con ' MPa' en el input individual
+            _crackInputs[i].result = sifValue.toStringAsFixed(2) + ' MPa';
+          }
+        }
+
+        _errorMessage = null;
+
+      } else {
+        // Manejar errores del servidor
+        try {
+          final errorData = jsonDecode(response.body);
+          _errorMessage = errorData['error'] ?? errorData['message'] ?? 'Error del servidor: ${response.statusCode}';
+        } catch (_) {
+          _errorMessage = 'Error del servidor: Código ${response.statusCode}.';
+        }
+      }
+
+    } catch (e) {
+      // Manejar errores de red o Timeout
+      _errorMessage = 'No se pudo conectar con el servidor (Timeout o Red).';
+      print("Error al realizar la predicción: $e");
     }
 
-    // El resultado principal muestra el total o el último, según el modelo físico
-    // Aquí mostraremos el resultado del último input o el total si es un cálculo agregado.
-    _sifResult = totalSIF;
-
     _isLoading = false;
-    notifyListeners();
-  }
-
-  void clearInput() {
-    _crackInputs.clear();
-    _crackInputs.add(CrackInput());
-    _sifResult = null;
-    _errorMessage = null;
     notifyListeners();
   }
 }

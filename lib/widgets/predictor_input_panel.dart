@@ -1,11 +1,7 @@
-// lib/widgets/predictor_input_panel.dart (MODIFICADO)
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/sif_predictor_viewmodel.dart';
-import 'input_action_button.dart';
-import 'result_output_panel.dart';
-import 'crack_input_row.dart'; // Importa el nuevo widget de fila
+import 'crack_input_row.dart';
 
 class PredictorInputPanel extends StatelessWidget {
   final Color primaryColor;
@@ -36,24 +32,20 @@ class PredictorInputPanel extends StatelessWidget {
             ),
             const Divider(height: 30),
 
-            // --- 1. LISTA DINÁMICA DE INPUTS ---
-            Flexible( // Permite que el Column dentro de la Card sepa cómo expandirse
-              child: SingleChildScrollView(
-                child: Column(
-                  children: viewModel.crackInputs.map((input) {
-                    return CrackInputRow(
-                      key: ValueKey(input.id), // Clave para manejo de lista
-                      crackInput: input,
-                      primaryColor: primaryColor,
-                    );
-                  }).toList(),
-                ),
-              ),
+            // ---  LISTA DINÁMICA DE INPUTS Y SUS RESULTADOS ---
+            Column(
+              children: viewModel.crackInputs.map((input) {
+                return CrackInputRow(
+                  key: ValueKey(input.id),
+                  crackInput: input,
+                  primaryColor: primaryColor,
+                );
+              }).toList(),
             ),
 
             const SizedBox(height: 16),
 
-            // --- 2. BOTÓN DE AGREGAR (+) ---
+            // --- BOTÓN DE AGREGAR (+) ---
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -71,7 +63,7 @@ class PredictorInputPanel extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // --- 3. BOTÓN DE CÁLCULO (MOVIDO ABAJO) ---
+            // ---  BOTÓN DE CÁLCULO (✓) ---
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -94,8 +86,12 @@ class PredictorInputPanel extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Resultado (ResultOutputPanel)
-            const ResultOutputPanel(),
+            // --- MENSAJE DE ERROR ---
+            if (viewModel.errorMessage != null)
+              Text(
+                viewModel.errorMessage!,
+                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
           ],
         ),
       ),

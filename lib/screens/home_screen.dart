@@ -8,26 +8,32 @@ class HomeScreen extends StatelessWidget {
 
   static const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
 
+  // Widget del área de la gráfica (contenedor gris)
+  Widget _buildGraphArea() {
+    return Container(
+      margin: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300)
+      ),
+      alignment: Alignment.center,
+      child: const Text(
+        'Gráfica de Esfuerzos / Resultados aquí',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.grey, fontSize: 16),
+      ),
+    );
+  }
+
+  // Widget de la barra de navegación inferior
+  Widget _buildBottomNavigation() {
+    return HomeBottomNav(primaryColor: primaryColor);
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    // El área de la gráfica
-    Widget _buildGraphArea() {
-      return Container(
-        margin: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300)
-        ),
-        alignment: Alignment.center,
-        child: const Text(
-          'Gráfica de Esfuerzos / Resultados aquí',
-          style: TextStyle(color: Colors.grey, fontSize: 16),
-        ),
-      );
-    }
-
+    // Cuerpo principal de la pantalla
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inicio', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
@@ -38,11 +44,10 @@ class HomeScreen extends StatelessWidget {
       drawer: const CustomDrawer(),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // Diseño para Tablet/Web
           if (constraints.maxWidth > 800) {
             return Row(
               children: <Widget>[
-                const SizedBox(
+                SizedBox(
                   width: 420,
                   child: PredictorInputPanel(primaryColor: primaryColor),
                 ),
@@ -52,19 +57,23 @@ class HomeScreen extends StatelessWidget {
               ],
             );
           } else {
-            return Column(
-              children: <Widget>[
-                PredictorInputPanel(primaryColor: primaryColor),
-                Expanded(
-                  child: _buildGraphArea(),
-                ),
-              ],
+            return SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  PredictorInputPanel(primaryColor: primaryColor),
+
+                  // Área de Gráfica
+                  SizedBox(
+                    height: 350,
+                    child: _buildGraphArea(),
+                  ),
+                ],
+              ),
             );
           }
         },
       ),
-      // Widget para la navegación inferior
-      bottomNavigationBar: HomeBottomNav(primaryColor: primaryColor),
+      bottomNavigationBar: _buildBottomNavigation(),
     );
   }
 }
