@@ -1,9 +1,11 @@
+// lib/widgets/predictor_input_panel.dart (MODIFICADO)
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/sif_predictor_viewmodel.dart';
-import 'crack_size_input.dart';
 import 'input_action_button.dart';
 import 'result_output_panel.dart';
+import 'crack_input_row.dart'; // Importa el nuevo widget de fila
 
 class PredictorInputPanel extends StatelessWidget {
   final Color primaryColor;
@@ -13,18 +15,6 @@ class PredictorInputPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<SifPredictorViewModel>(context);
-
-    // El controlador local ahora se mantiene aquí
-    final TextEditingController crackSizeController = TextEditingController(
-        text: viewModel.crackSize > 0 ? viewModel.crackSize.toString() : '');
-
-    // Sincronizar el controlador después de un 'clearInput' o actualización
-    if (viewModel.crackSize.toString() != crackSizeController.text && !viewModel.isLoading) {
-      crackSizeController.text = viewModel.crackSize > 0 ? viewModel.crackSize.toString() : '';
-      // Mueve el cursor al final
-      crackSizeController.selection = TextSelection.fromPosition(TextPosition(offset: crackSizeController.text.length));
-    }
-
 
     return Card(
       elevation: 4,
@@ -46,82 +36,67 @@ class PredictorInputPanel extends StatelessWidget {
             ),
             const Divider(height: 30),
 
-            // Controles de Input
-            Row(
-              children: <Widget>[
-                // Botón '+'
-                InputActionButton(
-                  icon: Icons.add,
-                  color: primaryColor,
-                  onPressed: () => print('Agregar nueva configuración'),
+            // --- 1. LISTA DINÁMICA DE INPUTS ---
+            Flexible( // Permite que el Column dentro de la Card sepa cómo expandirse
+              child: SingleChildScrollView(
+                child: Column(
+                  children: viewModel.crackInputs.map((input) {
+                    return CrackInputRow(
+                      key: ValueKey(input.id), // Clave para manejo de lista
+                      crackInput: input,
+                      primaryColor: primaryColor,
+                    );
+                  }).toList(),
                 ),
-                const SizedBox(width: 8),
-
-                // Botón 'Forma de grieta' (Mantenido aquí para la lógica de modal)
-                Expanded(
-                  child: _buildShapeSelectorButton(context, viewModel),
-                ),
-                const SizedBox(width: 8),
-
-                // Campo de entrada 'Tamaño (mm)'
-                Expanded(
-                  child: CrackSizeInput(controller: crackSizeController),
-                ),
-                const SizedBox(width: 8),
-
-                // Botón de Check (Calcular)
-                InputActionButton(
-                  icon: Icons.check,
-                  color: primaryColor,
-                  onPressed: viewModel.calculateSIF,
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Resultado
-            const ResultOutputPanel(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Helper para el botón de selector de forma (se mantiene aquí por el showModalBottomSheet)
-  Widget _buildShapeSelectorButton(BuildContext context, SifPredictorViewModel viewModel) {
-    return SizedBox(
-      height: 48,
-      child: OutlinedButton.icon(
-        icon: const Icon(Icons.apps, size: 20),
-        label: Text(
-          viewModel.crackShape ?? 'Forma de grieta',
-          overflow: TextOverflow.ellipsis,
-        ),
-        onPressed: () {
-          final options = ['Recta', 'Curva', 'Mixta'];
-          showModalBottomSheet(
-            context: context,
-            builder: (ctx) => SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: options.map((option) {
-                  return ListTile(
-                    title: Text(option),
-                    onTap: () {
-                      viewModel.setCrackShape(option);
-                      Navigator.pop(ctx);
-                    },
-                  );
-                }).toList(),
               ),
             ),
-          );
-        },
-        style: OutlinedButton.styleFrom(
-          foregroundColor: primaryColor,
-          side: BorderSide(color: Colors.grey.shade400),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+
+            const SizedBox(height: 16),
+
+            // --- 2. BOTÓN DE AGREGAR (+) ---
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.add, size: 20),
+                label: const Text('Agregar Grieta'),
+                onPressed: viewModel.addCrackInput,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: primaryColor,
+                  side: BorderSide(color: primaryColor),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // --- 3. BOTÓN DE CÁLCULO (MOVIDO ABAJO) ---
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                icon: viewModel.isLoading
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Icon(Icons.check, color: Colors.white),
+                label: Text(
+                  viewModel.isLoading ? 'Calculando...' : 'Calcular SIF',
+                  style: const TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                onPressed: viewModel.isLoading ? null : viewModel.calculateSIF,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  elevation: 4,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Resultado (ResultOutputPanel)
+            const ResultOutputPanel(),
+          ],
         ),
       ),
     );

@@ -12,6 +12,7 @@ class HomeBottomNav extends StatelessWidget {
     // Escucha el ViewModel
     final viewModel = Provider.of<SifPredictorViewModel>(context);
 
+    // Estas propiedades fueron conservadas en el ViewModel y funcionan
     return BottomNavigationBar(
       currentIndex: viewModel.selectedTabIndex,
       onTap: viewModel.selectTab,

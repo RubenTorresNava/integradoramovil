@@ -4,14 +4,18 @@ import '../viewmodels/sif_predictor_viewmodel.dart';
 
 class CrackSizeInput extends StatelessWidget {
   final TextEditingController controller;
+  // AÑADIDO: Necesitas el ID o el objeto CrackInput para saber qué fila actualizar
+  final CrackInput crackInput;
 
   const CrackSizeInput({
     Key? key,
     required this.controller,
+    required this.crackInput, // Incluye el objeto CrackInput
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Escuchar el ViewModel con listen: false para llamar a la función
     final viewModel = Provider.of<SifPredictorViewModel>(context, listen: false);
 
     return SizedBox(
@@ -26,19 +30,20 @@ class CrackSizeInput extends StatelessWidget {
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          suffixIcon: viewModel.crackSize > 0
+          // MODIFICACIÓN: Usar el tamaño del input individual para mostrar el botón X
+          suffixIcon: (crackInput.size != null && crackInput.size! > 0)
               ? IconButton(
             icon: const Icon(Icons.close, color: Colors.grey, size: 18),
-            onPressed: () => viewModel.clearInput(),
+            // MODIFICACIÓN: Llamar a removeCrackInput para borrar la fila
+            onPressed: () => viewModel.removeCrackInput(crackInput.id),
           )
               : null,
         ),
         onChanged: (value) {
           double? size = double.tryParse(value);
-          if (size != null) {
-            // Usa listen: false aquí porque solo necesitas llamar a la función, no reconstruir.
-            Provider.of<SifPredictorViewModel>(context, listen: false).setCrackSize(size);
-          }
+          // MODIFICACIÓN: Usar la nueva función setCrackSize con el ID de la grieta
+          // Si size es null (entrada no válida), pasamos null o 0.0, según cómo lo maneje el ViewModel
+          viewModel.setCrackSize(crackInput.id, size!);
         },
       ),
     );
