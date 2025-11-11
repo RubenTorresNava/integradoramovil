@@ -13,7 +13,7 @@ class CrackInput {
 
 class SifPredictorViewModel extends ChangeNotifier {
   // --- CONSTANTE: URL DE TU API ---
-  final String _apiUrl = 'http://192.168.1.6:5000/predict';
+  final String _apiUrl = 'https://turbidimetrically-unmentionable-agustina.ngrok-free.dev/predict';
 
   // --- ESTADO ---
   final List<CrackInput> _crackInputs = [CrackInput()];
