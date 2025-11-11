@@ -30,7 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.0.0
+  http: ^1.2.1 # O la versión más reciente
+  provider: ^6.1.2 # O la versión más reciente
   intl: ^0.18.0
   http: ^1.1.0
 
