@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert'; // <-- 1. Importar
 import 'package:http/http.dart' as http; // <-- 2. Importar
 import '../providers/auth_provider.dart'; // <-- 3. Importar AuthProvider
+import '../config/api_config.dart'; // Importar la configuración
 
 // Definición del modelo de datos
 class HistoryEntry {
@@ -38,7 +39,7 @@ class HistoryEntry {
 
 class HistoryViewModel extends ChangeNotifier {
   final AuthProvider _authProvider;
-  final String _apiUrl = 'http://10.0.2.2:8000';
+  final String _apiUrl = ApiConfig.fastApiBaseUrl;
   
   List<HistoryEntry> _entries = [];
   bool _isLoading = false;

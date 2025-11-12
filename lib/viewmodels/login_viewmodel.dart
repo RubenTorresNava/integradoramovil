@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http; // Importar http
 import 'package:provider/provider.dart'; // Importar provider
 import './../providers/auth_provider.dart'; // Importar nuestro "cerebro"
+import '../config/api_config.dart'; // Importar la configuración
 
 // 1. Un ChangeNotifier es lo que 'Provider' observa para notificar cambios.
 class LoginViewModel extends ChangeNotifier {
@@ -13,7 +14,7 @@ class LoginViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  final String _apiUrl = 'http://10.0.2.2:8000';
+  final String _apiUrl = ApiConfig.fastApiBaseUrl;
 
   // 2. La lógica de negocio
   Future<void> signIn(String email, String password, BuildContext context) async {

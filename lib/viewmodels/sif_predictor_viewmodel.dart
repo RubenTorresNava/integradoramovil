@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart'; // <-- 1. Importar Provider
 import '../providers/auth_provider.dart'; // <-- 2. Importar AuthProvider
+import '../config/api_config.dart'; // Importar la configuración
 
 class CrackInput {
   String id = UniqueKey().toString();
@@ -15,8 +16,8 @@ class CrackInput {
 
 class SifPredictorViewModel extends ChangeNotifier {
   // --- CONSTANTE: URL DE TU API ---
-  final String _predUrl = 'http://192.168.1.84:5000/predict';
-  final String _apiUrl = 'http://10.0.2.2:8000';
+  final String _predUrl = '${ApiConfig.mlApiBaseUrl}/predict';
+  final String _apiUrl = ApiConfig.fastApiBaseUrl;
 
   final AuthProvider _authProvider;
 

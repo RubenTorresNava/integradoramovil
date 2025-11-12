@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert'; // <-- 1. Importar dart:convert para json.encode
 import 'package:http/http.dart' as http; // <-- 2. Importar http
+import '../config/api_config.dart'; // Importar la configuración
 
 class RegisterViewModel extends ChangeNotifier {
   bool _isLoading = false;
@@ -9,7 +10,7 @@ class RegisterViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  final String _apiUrl = 'http://10.0.2.2:8000';
+  final String _apiUrl = ApiConfig.fastApiBaseUrl;
 
   Future<void> register(String name, String email, String password, String confirmPassword, BuildContext context) async {
     _isLoading = true;

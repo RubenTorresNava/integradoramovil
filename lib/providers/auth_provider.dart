@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http; // <-- 1. Importar http
 import 'dart:convert'; // <-- 2. Importar convert
 import '../models/usuario.dart'; // <-- 3. Importar nuestro nuevo modelo
+import '../config/api_config.dart'; // Importar la configuración
 
 class AuthProvider with ChangeNotifier {
   String? _token;
@@ -13,9 +14,8 @@ class AuthProvider with ChangeNotifier {
   final _storage = const FlutterSecureStorage();
 
   // --- 5. Definir la URL de la API (¡RECUERDA EL TEMA DE LOCALHOST!) ---
-  // Android Emu: 'http://10.0.2.2:8000'
-  // iOS Sim o Teléfono Físico: IP de tu PC (ej. 'http://192.168.1.100:8000')
-  final String _apiUrl = 'http://10.0.2.2:8000'; // <-- CAMBIA ESTO
+  // Se usa la configuración centralizada
+  final String _apiUrl = ApiConfig.fastApiBaseUrl;
 
   // --- Getters públicos ---
   String? get token => _token;
