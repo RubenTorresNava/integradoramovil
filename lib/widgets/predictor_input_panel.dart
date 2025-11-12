@@ -6,7 +6,7 @@ import 'crack_input_row.dart';
 class PredictorInputPanel extends StatelessWidget {
   final Color primaryColor;
 
-  const PredictorInputPanel({Key? key, required this.primaryColor}) : super(key: key);
+  const PredictorInputPanel({super.key, required this.primaryColor});
 
   @override
   Widget build(BuildContext context) {

@@ -5,10 +5,10 @@ class ResourceSectionCard extends StatelessWidget {
   final Widget content;
 
   const ResourceSectionCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.content,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

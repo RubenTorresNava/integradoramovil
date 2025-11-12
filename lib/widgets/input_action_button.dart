@@ -6,11 +6,11 @@ class InputActionButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const InputActionButton({
-    Key? key,
+    super.key,
     required this.icon,
     required this.color,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

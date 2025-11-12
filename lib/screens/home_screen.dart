@@ -4,7 +4,7 @@ import '../widgets/predictor_input_panel.dart';
 import '../widgets/home_bottom_nav.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   static const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
 
@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
 
   // Widget de la barra de navegación inferior
   Widget _buildBottomNavigation() {
-    return HomeBottomNav(primaryColor: primaryColor);
+    return const HomeBottomNav(primaryColor: primaryColor);
   }
 
   @override
@@ -47,7 +47,7 @@ class HomeScreen extends StatelessWidget {
           if (constraints.maxWidth > 800) {
             return Row(
               children: <Widget>[
-                SizedBox(
+                const SizedBox(
                   width: 420,
                   child: PredictorInputPanel(primaryColor: primaryColor),
                 ),
@@ -60,7 +60,7 @@ class HomeScreen extends StatelessWidget {
             return SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  PredictorInputPanel(primaryColor: primaryColor),
+                  const PredictorInputPanel(primaryColor: primaryColor),
 
                   // Área de Gráfica
                   SizedBox(

@@ -8,10 +8,10 @@ class CrackSizeInput extends StatelessWidget {
   final CrackInput crackInput;
 
   const CrackSizeInput({
-    Key? key,
+    super.key,
     required this.controller,
     required this.crackInput, // Incluye el objeto CrackInput
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

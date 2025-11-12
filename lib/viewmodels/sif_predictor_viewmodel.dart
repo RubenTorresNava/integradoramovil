@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart'; // <-- 1. Importar Provider
+import '../providers/auth_provider.dart'; // <-- 2. Importar AuthProvider
 
 class CrackInput {
   String id = UniqueKey().toString();
@@ -13,7 +15,15 @@ class CrackInput {
 
 class SifPredictorViewModel extends ChangeNotifier {
   // --- CONSTANTE: URL DE TU API ---
-  final String _apiUrl = 'https://turbidimetrically-unmentionable-agustina.ngrok-free.dev/predict';
+  final String _predUrl = 'http://192.168.1.84:5000/predict';
+  final String _apiUrl = 'http://10.0.2.2:8000';
+
+  final AuthProvider _authProvider;
+
+  // --- 5. CONSTRUCTOR MODIFICADO ---
+  // Ahora "recibe" el AuthProvider que 'main.dart' le inyecta
+  SifPredictorViewModel({required AuthProvider authProvider})
+      : _authProvider = authProvider;
 
   // --- ESTADO ---
   final List<CrackInput> _crackInputs = [CrackInput()];
@@ -79,9 +89,20 @@ class SifPredictorViewModel extends ChangeNotifier {
       return;
     }
 
+    // --- 6. Obtener el token ANTES de empezar ---
+    final token = _authProvider.token;
+    if (token == null) {
+      _errorMessage =
+          'Error de autenticación. Por favor, inicia sesión de nuevo.';
+      notifyListeners();
+      // (El Consumer en main.dart probablemente ya te habría redirigido)
+      return;
+    }
+
     _isLoading = true;
     _errorMessage = null;
     _sifResult = null;
+    notifyListeners();
 
     // Limpiar resultados anteriores en la lista
     for (var input in _crackInputs) {
@@ -93,7 +114,7 @@ class SifPredictorViewModel extends ChangeNotifier {
       // Preparar los datos
       final features = _crackInputs.map((input) => input.size).toList();
       final body = jsonEncode({'features': features});
-      final url = Uri.parse(_apiUrl);
+      final url = Uri.parse(_predUrl);
 
       // Petición HTTP POST
       final response = await http.post(
@@ -106,6 +127,7 @@ class SifPredictorViewModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final List<dynamic> predictions = data['predictions'];
+        final List<double> sifValues = []; // Guardamos los valores numéricos
 
         // Asignar resultados individuales
         for (int i = 0; i < predictions.length; i++) {
@@ -114,11 +136,69 @@ class SifPredictorViewModel extends ChangeNotifier {
             final double sifValue = (predictions[i][0] as num).toDouble();
 
             // Almacenar el resultado formateado con ' MPa' en el input individual
-            _crackInputs[i].result = sifValue.toStringAsFixed(2) + ' MPa';
+            _crackInputs[i].result = '${sifValue.toStringAsFixed(2)} MPa';
+
+            sifValues.add(sifValue);
+            
           }
         }
 
         _errorMessage = null;
+        notifyListeners();
+
+        // --- PASO 3: LLAMADA A LA API DE FASTAPI (:8000) ---
+        print("LOG API-FASTAPI: Guardando ${sifValues.length} resultados...");
+
+        // TODO: Estos IDs (1 y 1) son fijos.
+        // Deberías tener una lógica para que el usuario seleccione
+        // el 'modelo' y 'geometria' y obtener sus IDs reales.
+        const int modeloId = 1;
+        const int geometriaId = 1;
+
+        // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
+        // Usamos List.generate para iterar de forma segura con un índice
+        final calculoBody = jsonEncode(List.generate(sifValues.length, (index) {
+          // Obtenemos los valores de cada lista usando el mismo índice
+          final double sifValor = sifValues[index];
+          final double? entradaGrieta = _crackInputs[index].size;
+
+          return {
+            'modelo_id': modeloId,
+            'geometria_id': geometriaId,
+            'valor_entrada_grieta': entradaGrieta,
+            'valor_salida_esfuerzo': sifValor,
+            'plataforma': "movil"
+          };
+        }) // .toList() no es necesario, List.generate ya devuelve una lista
+            );
+        // --- FIN DE LA CORRECCIÓN ---
+
+        final fastApiUrl = Uri.parse('$_apiUrl/calculos/batch');
+        final responseFastAPI = await http
+            .post(
+              fastApiUrl,
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $token' // ¡Usamos el token!
+              },
+              body: calculoBody,
+            )
+            .timeout(const Duration(seconds: 10));
+
+            if (responseFastAPI.statusCode == 201) {
+          // ¡Guardado con éxito!
+          print("LOG API-FASTAPI: Lote de cálculos guardado exitosamente.");
+        } else if (responseFastAPI.statusCode == 401) {
+          // Token expirado
+          _errorMessage =
+              "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.";
+          _authProvider.logout(); // Limpiamos la sesión
+        } else {
+          // Otro error de guardado
+          print("LOG API-FASTAPI: Error al guardar ${responseFastAPI.body}");
+          _errorMessage =
+              "No se pudieron guardar los resultados (Código ${responseFastAPI.statusCode})";
+        }
 
       } else {
         // Manejar errores del servidor

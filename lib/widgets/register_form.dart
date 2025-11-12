@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../viewmodels/register_viewmodel.dart';
 
 class RegisterForm extends StatelessWidget {
-  const RegisterForm({Key? key}) : super(key: key);
+  const RegisterForm({super.key});
 
   @override
   Widget build(BuildContext context) {

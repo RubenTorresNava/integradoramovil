@@ -5,7 +5,7 @@ import '../viewmodels/resources_viewmodel.dart';
 import 'resource_section_card.dart';
 
 class PublicationSection extends StatelessWidget {
-  const PublicationSection({Key? key}) : super(key: key);
+  const PublicationSection({super.key});
 
   static const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
 

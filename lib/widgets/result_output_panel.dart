@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../viewmodels/sif_predictor_viewmodel.dart';
 
 class ResultOutputPanel extends StatelessWidget {
-  const ResultOutputPanel({Key? key}) : super(key: key);
+  const ResultOutputPanel({super.key});
 
   static const Color secondaryColor = Color.fromARGB(255, 128, 55, 93);
 

@@ -4,7 +4,7 @@ import '../viewmodels/resources_viewmodel.dart';
 import 'resource_section_card.dart';
 
 class ScriptListSection extends StatelessWidget {
-  const ScriptListSection({Key? key}) : super(key: key);
+  const ScriptListSection({super.key});
 
   static const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
 

@@ -8,10 +8,10 @@ class HistoryListItem extends StatelessWidget {
   final Color primaryColor;
 
   const HistoryListItem({
-    Key? key,
+    super.key,
     required this.entry,
     required this.primaryColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class HistoryListItem extends StatelessWidget {
                 const SizedBox(height: 4),
                 // Tipo de Grieta y Tamaño
                 Text(
-                  '${entry.shape}, ${entry.size.toStringAsFixed(0)}mm',
+                  '${entry.shape}, ${entry.size.toStringAsFixed(2)}mm',
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],

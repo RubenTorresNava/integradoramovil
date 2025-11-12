@@ -8,7 +8,7 @@ import '../widgets/publication_section.dart';
 import '../viewmodels/resources_viewmodel.dart';
 
 class ResourcesScreen extends StatelessWidget {
-  const ResourcesScreen({Key? key}) : super(key: key);
+  const ResourcesScreen({super.key});
 
   static const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
 

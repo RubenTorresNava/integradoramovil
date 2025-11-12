@@ -7,10 +7,10 @@ class CrackInputRow extends StatelessWidget {
   final Color primaryColor;
 
   const CrackInputRow({
-    Key? key,
+    super.key,
     required this.crackInput,
     required this.primaryColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

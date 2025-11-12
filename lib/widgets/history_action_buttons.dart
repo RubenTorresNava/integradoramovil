@@ -5,7 +5,7 @@ import '../viewmodels/history_viewmodel.dart';
 class HistoryActionButtons extends StatelessWidget {
   final Color primaryColor;
 
-  const HistoryActionButtons({Key? key, required this.primaryColor}) : super(key: key);
+  const HistoryActionButtons({super.key, required this.primaryColor});
 
   @override
   Widget build(BuildContext context) {

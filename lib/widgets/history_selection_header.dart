@@ -5,7 +5,7 @@ import '../viewmodels/history_viewmodel.dart';
 class HistorySelectionHeader extends StatelessWidget {
   final Color primaryColor;
 
-  const HistorySelectionHeader({Key? key, required this.primaryColor}) : super(key: key);
+  const HistorySelectionHeader({super.key, required this.primaryColor});
 
   @override
   Widget build(BuildContext context) {

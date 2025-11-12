@@ -7,7 +7,7 @@ import '../widgets/history_action_buttons.dart';
 import '../viewmodels/history_viewmodel.dart';
 
 class HistoryScreen extends StatelessWidget {
-  const HistoryScreen({Key? key}) : super(key: key);
+  const HistoryScreen({super.key});
 
   static const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
 
@@ -38,12 +38,12 @@ class HistoryScreen extends StatelessWidget {
       body: Column(
         children: <Widget>[
           // Encabezado de Selección (Widget externo)
-          HistorySelectionHeader(primaryColor: primaryColor),
+          const HistorySelectionHeader(primaryColor: primaryColor),
 
           // Lista de Historial
           Expanded(
             child: Container(
-              color: const Color.fromRGBO(27, 27, 27, 1.0), // Fondo muy oscuro para la lista
+              color: const Color.fromARGB(255, 214, 209, 209), // Fondo muy oscuro para la lista
               child: viewModel.isLoading
                   ? const Center(child: CircularProgressIndicator(color: primaryColor))
                   : ListView.builder(
@@ -59,7 +59,7 @@ class HistoryScreen extends StatelessWidget {
         ],
       ),
       // Botones de Acción Flotantes (Widget externo)
-      floatingActionButton: HistoryActionButtons(primaryColor: primaryColor),
+      floatingActionButton: const HistoryActionButtons(primaryColor: primaryColor),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }

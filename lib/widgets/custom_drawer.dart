@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // <-- 1. IMPORTAR PROVIDER
+import '../providers/auth_provider.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({Key? key}) : super(key: key);
@@ -7,6 +9,16 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     // El color morado oscuro del diseño
     const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
+
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    // --- 2. Extraer los datos del usuario de forma segura ---
+    // Usamos '??' para poner valores por defecto mientras carga
+    final String nombreUsuario = authProvider.user?.nombre ?? 'Cargando...';
+    final String emailUsuario = authProvider.user?.email ?? '...';
+    final String inicialUsuario = authProvider.user?.nombre.isNotEmpty == true
+        ? authProvider.user!.nombre[0].toUpperCase()
+        : '?';
 
     return Drawer(
       width: 250, // Ancho fijo para el drawer
@@ -69,14 +81,26 @@ class CustomDrawer extends StatelessWidget {
 
           // Icono de usuario (Adaptado de la esquina superior derecha)
           ListTile(
-            leading: const CircleAvatar(
+            leading: CircleAvatar(
               backgroundColor: Colors.white,
-              child: Text('A', style: TextStyle(color: primaryColor)),
+              // Muestra la inicial del usuario
+              child: Text(inicialUsuario,
+                  style: const TextStyle(
+                      color: primaryColor, fontWeight: FontWeight.bold)),
             ),
-            title: const Text('Usuario A', style: TextStyle(color: Colors.white)),
+            // Muestra el nombre real
+            title: Text(nombreUsuario,
+                style: const TextStyle(color: Colors.white)),
+            // Muestra el email real
+            subtitle: Text(emailUsuario,
+                style: const TextStyle(color: Colors.white70, fontSize: 12)),
+
             onTap: () {
-              // Lógica para cerrar sesión/perfil
+              // La lógica de Logout (no cambia)
               Navigator.pop(context);
+              authProvider.logout();
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/', (Route<dynamic> route) => false);
             },
           ),
         ],

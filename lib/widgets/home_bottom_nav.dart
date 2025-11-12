@@ -5,7 +5,7 @@ import '../viewmodels/sif_predictor_viewmodel.dart';
 class HomeBottomNav extends StatelessWidget {
   final Color primaryColor;
 
-  const HomeBottomNav({Key? key, required this.primaryColor}) : super(key: key);
+  const HomeBottomNav({super.key, required this.primaryColor});
 
   @override
   Widget build(BuildContext context) {

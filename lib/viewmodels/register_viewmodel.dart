@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert'; // <-- 1. Importar dart:convert para json.encode
+import 'package:http/http.dart' as http; // <-- 2. Importar http
 
 class RegisterViewModel extends ChangeNotifier {
   bool _isLoading = false;
@@ -6,6 +8,8 @@ class RegisterViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+
+  final String _apiUrl = 'http://10.0.2.2:8000';
 
   Future<void> register(String name, String email, String password, String confirmPassword, BuildContext context) async {
     _isLoading = true;
@@ -29,22 +33,54 @@ class RegisterViewModel extends ChangeNotifier {
 
     // Puedes agregar más validaciones aquí (ej. formato de email)
 
-    // --- Simulación de llamada a API ---
-    await Future.delayed(const Duration(seconds: 2)); // Simula un retraso de red
+    try {
+      final url = Uri.parse('$_apiUrl/usuarios/');
 
-    // Simular un registro exitoso o fallido
-    if (email.contains('@') && password.length >= 6) { // Validación simple
-      print("Usuario registrado: $name, $email");
+      // ¡Importante! La API espera 'nombre' y un body JSON
+      final body = json.encode({
+        'nombre': name, // Usamos 'nombre' como espera la API
+        'email': email,
+        'password': password,
+      });
 
-      // Lógica para navegar de vuelta al login o a una pantalla de éxito
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Registro exitoso!')),
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type':
+              'application/json', // Le decimos a la API que enviamos JSON
+        },
+        body: body,
       );
-      Navigator.of(context).pop(); // Vuelve a la pantalla anterior (Login)
 
-    } else {
-      _errorMessage = 'Error en el registro. Verifica tus datos.';
-      print("Error en el registro para $email");
+      // 201 Creado (Respuesta de éxito de FastAPI para este endpoint)
+      if (response.statusCode == 201) {
+        print("Usuario registrado: $name, $email");
+
+        // Lógica de éxito (sin cambios)
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('¡Registro exitoso! Por favor, inicie sesión.')),
+          );
+          Navigator.of(context).pop(); // Vuelve a la pantalla anterior (Login)
+        }
+      }
+      // 400 Bad Request (Lo que la API devuelve si el email ya existe)
+      else if (response.statusCode == 400) {
+        final errorData = json.decode(response.body);
+        _errorMessage = errorData['detail'] ?? 'El email ya está registrado.';
+      }
+      // 422 Unprocessable Entity (Si la contraseña es muy corta, etc.)
+      else if (response.statusCode == 422) {
+        _errorMessage = 'Los datos no son válidos (ej. contraseña muy corta).';
+      } else {
+        // Otros errores del servidor
+        _errorMessage = 'Error en el registro. Código: ${response.statusCode}';
+      }
+    } catch (e) {
+      // Error de red o conexión
+      _errorMessage = 'Error de conexión. Revisa tu red o la IP del servidor.';
+      print("Error en el registro (catch): $e");
     }
 
     _isLoading = false;
