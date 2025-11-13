@@ -13,8 +13,6 @@ class AuthProvider with ChangeNotifier {
   bool _isLoading = true;
   final _storage = const FlutterSecureStorage();
 
-  // --- 5. Definir la URL de la API (¡RECUERDA EL TEMA DE LOCALHOST!) ---
-  // Se usa la configuración centralizada
   final String _apiUrl = ApiConfig.fastApiBaseUrl;
 
   // --- Getters públicos ---
@@ -85,5 +83,46 @@ class AuthProvider with ChangeNotifier {
     _isLoading = false;
     await _storage.delete(key: 'authToken');
     notifyListeners();
+  }
+
+  Future<void> updateUserName(String newName) async {
+    // 1. Salir si no estamos autenticados
+    if (_token == null) {
+      throw Exception('No autenticado');
+    }
+
+    try {
+      final url = Uri.parse('$_apiUrl/usuarios/me/');
+
+      final response = await http.patch(
+        // <-- Usamos PATCH
+        url,
+        headers: {
+          'Authorization': 'Bearer $_token',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: json.encode({
+          'nombre': newName,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // El body de respuesta contiene el objeto Usuario actualizado
+        final responseData = json.decode(response.body);
+
+        // 3. Actualizar nuestro estado local
+        _user = Usuario.fromJson(responseData);
+
+        // 4. Notificar a toda la app (el Drawer, etc.) del cambio
+        notifyListeners();
+      } else {
+        // 5. Manejar error
+        print("Error al actualizar nombre: ${response.body}");
+        throw Exception('Error al actualizar el nombre');
+      }
+    } catch (e) {
+      print("Error (catch) al actualizar nombre: $e");
+      throw Exception('Error al actualizar el nombre');
+    }
   }
 }
