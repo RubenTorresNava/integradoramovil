@@ -132,8 +132,8 @@ class HistoryViewModel extends ChangeNotifier {
     try {
       // Creamos una lista de futuros de borrado
       final deletePromises = itemsToDelete.map((entry) {
-        final url = Uri.parse('$_apiUrl/calculos/${entry.id}');
-        return http.delete(
+        final url = Uri.parse('$_apiUrl/calculos/${entry.id}/deactivate');
+        return http.put(
           url,
           headers: {
             'Authorization': 'Bearer $token',
