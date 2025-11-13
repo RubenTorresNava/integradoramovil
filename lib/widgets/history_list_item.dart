@@ -19,7 +19,7 @@ class HistoryListItem extends StatelessWidget {
     final viewModel = Provider.of<HistoryViewModel>(context, listen: false);
 
     // Formatear la fecha como "dd/MM/yy"
-    final formattedDate = DateFormat('dd/MM/yy').format(entry.date);
+    final formattedDate = DateFormat('dd/MM/yy, hh:mm a').format(entry.date);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),

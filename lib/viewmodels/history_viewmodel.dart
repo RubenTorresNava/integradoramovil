@@ -25,11 +25,12 @@ class HistoryEntry {
   // --- 4. Factory constructor para parsear el JSON de la API ---
   // Esto "traduce" la respuesta de la API a nuestro modelo de UI
   factory HistoryEntry.fromJson(Map<String, dynamic> json) {
+    final String fechaApi = json['fecha_calculo'];
     return HistoryEntry(
       id: json['registro_id'].toString(), // Convertimos el int a String
       result: double.parse(json['valor_salida_esfuerzo']),
       date:
-          DateTime.parse(json['fecha_calculo']), // Parseamos el string de fecha
+          DateTime.parse(fechaApi + 'Z'), // Parseamos el string de fecha
       shape: json['modelo']['nombre'], // Obtenemos el nombre del modelo anidado
       size: double.parse(json['valor_entrada_grieta']),
       isSelected: false,
