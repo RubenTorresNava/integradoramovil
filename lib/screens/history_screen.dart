@@ -16,6 +16,10 @@ class HistoryScreen extends StatelessWidget {
     // El widget escucha el ViewModel para reconstruir la lista (carga y datos)
     final viewModel = Provider.of<HistoryViewModel>(context);
 
+    // 'read' se usa para llamar a funciones de forma segura dentro de callbacks
+    // como onPressed, sin causar re-builds innecesarios.
+    final viewModelReader = context.read<HistoryViewModel>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -24,8 +28,21 @@ class HistoryScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: primaryColor),
         elevation: 0,
-        actions: const [
-          Padding(
+        actions:  [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            color: primaryColor, // Para que coincida con el tema del ícono
+            tooltip: 'Actualizar historial',
+
+            onPressed: viewModel.isLoading
+                ? null // 'null' deshabilita automáticamente el IconButton
+                : () {
+                    // 4. Llama a la función que YA EXISTE en tu ViewModel
+                    print("Refrescando historial...");
+                    viewModelReader.fetchHistory();
+                  },
+          ),
+          const Padding(
             padding: EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
               backgroundColor: primaryColor,

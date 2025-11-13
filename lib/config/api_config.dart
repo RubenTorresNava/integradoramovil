@@ -12,9 +12,9 @@ class ApiConfig {
 
   // Esta es la IP de tu PC en la red WiFi que nos diste.
   // Es la ÚNICA LÍNEA que debes cambiar si tu WiFi te da una IP nueva.
-  static const String _localMlIp = '192.168.1.84';
+  static const String predApiBaseUrl = 'https://eyeable-receptually-nicholle.ngrok-free.dev';
 
-  // IPs especiales para emuladores/simuladores
+/*   // IPs especiales para emuladores/simuladores
   static const String _androidEmulatorIp = '10.0.2.2';
   static const String _iosSimulatorIp = '127.0.0.1'; // o 'localhost'
   static const String _mlApiPort = '5000';
@@ -42,5 +42,5 @@ class ApiConfig {
     // o para un build de release (que fallará si no está en la WiFi),
     // usamos la IP local.
     return 'http://$_localMlIp:$_mlApiPort';
-  }
+  } */
 }
