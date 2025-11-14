@@ -1,66 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodels/login_viewmodel.dart';
+import '../viewmodels/login_viewmodel.dart'; // Asegúrate de que esta ruta sea correcta
 
-class LoginForm extends StatelessWidget {
+// 1. Convertido a StatefulWidget
+class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // 1. Obtener acceso al ViewModel (la lógica)
-    // El widget se reconstruirá cada vez que el ViewModel llame a notifyListeners()
-    final viewModel = Provider.of<LoginViewModel>(context);
+  State<LoginForm> createState() => _LoginFormState();
+}
 
-    // Controladores de texto. Se definen aquí ya que son necesarios solo para este widget.
-    // El estado de lo que escriben queda en el TextField, pero el valor se pasa al ViewModel al presionar el botón.
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+class _LoginFormState extends State<LoginForm> {
+  // 2. Estado local para la visibilidad de la contraseña
+  bool _isPasswordVisible = false;
+
+  // 3. Controladores de texto movidos al State
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  static const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
+
+  @override
+  void dispose() {
+    // Liberar los controladores para evitar fugas de memoria
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Escucha el ViewModel para reconstruir con el estado de carga/error
+    final viewModel = context.watch<LoginViewModel>();
 
     return Column(
       children: <Widget>[
-        // Campo de Correo
-        TextField(
-          controller: emailController,
+        // Campo de Correo (sin cambios)
+        _buildTextField(
+          controller: _emailController,
+          hintText: 'Correo',
+          icon: Icons.mail,
           keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.mail, color: Colors.black54),
-            hintText: 'Correo',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
-          ),
-          style: const TextStyle(color: Colors.black87),
         ),
         const SizedBox(height: 16.0),
 
-        // Campo de Contraseña
-        TextField(
-          controller: passwordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.lock, color: Colors.black54),
-            hintText: 'Contraseña',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
-          ),
-          style: const TextStyle(color: Colors.black87),
+        // Campo de Contraseña (con alternancia de visibilidad)
+        _buildPasswordField(
+          controller: _passwordController,
+          hintText: 'Contraseña',
+          isVisible: _isPasswordVisible,
+          onToggleVisibility: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
         ),
 
         // Mensaje de Error
@@ -81,19 +74,18 @@ class LoginForm extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: ElevatedButton(
-                // 2. Lógica del botón: Si está cargando, es null (deshabilitado)
                 onPressed: viewModel.isLoading
                     ? null
                     : () {
-                  // Llama a la función signIn del ViewModel, pasando los datos del formulario
-                  viewModel.signIn(
-                    emailController.text,
-                    passwordController.text,
+                  // Usamos context.read (no escucha) para llamar a la función
+                  context.read<LoginViewModel>().signIn(
+                    _emailController.text,
+                    _passwordController.text,
                     context,
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(104, 36, 68, 1),
+                  backgroundColor: primaryColor,
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
@@ -104,7 +96,7 @@ class LoginForm extends StatelessWidget {
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                ) // Muestra el spinner de carga
+                )
                     : const Text(
                   'Iniciar sesión',
                   style: TextStyle(fontSize: 18.0, color: Colors.white),
@@ -113,7 +105,6 @@ class LoginForm extends StatelessWidget {
             ),
             const SizedBox(width: 16.0),
             TextButton(
-              // 3. Lógica del botón Registrarse
               onPressed: viewModel.isLoading ? null : () => viewModel.goToRegister(context),
               child: Text(
                 'Registrarse',
@@ -126,6 +117,72 @@ class LoginForm extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+
+  // --- WIDGETS AUXILIARES REUTILIZADOS ---
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    required TextInputType keyboardType,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[200],
+        prefixIcon: Icon(icon, color: Colors.black54),
+        hintText: hintText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: const BorderSide(color: primaryColor, width: 2.0),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+      ),
+      style: const TextStyle(color: Colors.black87),
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String hintText,
+    required bool isVisible,
+    required VoidCallback onToggleVisibility,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: !isVisible, // Ocultar si isVisible es false
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[200],
+        prefixIcon: const Icon(Icons.lock, color: Colors.black54),
+        hintText: hintText,
+        // Ícono de alternancia
+        suffixIcon: IconButton(
+          icon: Icon(
+            isVisible ? Icons.visibility : Icons.visibility_off,
+            color: Colors.black54,
+          ),
+          onPressed: onToggleVisibility,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: const BorderSide(color: primaryColor, width: 2.0),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+      ),
+      style: const TextStyle(color: Colors.black87),
     );
   }
 }

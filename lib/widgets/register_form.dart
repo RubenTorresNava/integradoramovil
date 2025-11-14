@@ -1,114 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodels/register_viewmodel.dart';
+import '../viewmodels/register_viewmodel.dart'; // Asegúrate de que esta ruta sea correcta
 
-class RegisterForm extends StatelessWidget {
+// 1. Convertido a StatefulWidget
+class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final viewModel = Provider.of<RegisterViewModel>(context);
+  State<RegisterForm> createState() => _RegisterFormState();
+}
 
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-    final TextEditingController confirmPasswordController = TextEditingController();
+class _RegisterFormState extends State<RegisterForm> {
+  // 2. Estado local para la visibilidad de las contraseñas
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
+
+  // 3. Controladores de texto movidos al State
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
+  static const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<RegisterViewModel>();
 
     return Column(
       children: <Widget>[
-        // Campo de Nombre
-        TextField(
-          controller: nameController,
+        // --- Campo de Nombre ---
+        _buildStandardTextField(
+          controller: _nameController,
+          hintText: 'Nombre',
+          icon: Icons.person,
           keyboardType: TextInputType.name,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.person, color: Colors.black54),
-            hintText: 'Nombre',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(
-                  color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
-          ),
-          style: const TextStyle(color: Colors.black87),
         ),
         const SizedBox(height: 16.0),
 
-        // Campo de Correo
-        TextField(
-          controller: emailController,
+        // --- Campo de Correo ---
+        _buildStandardTextField(
+          controller: _emailController,
+          hintText: 'Correo',
+          icon: Icons.mail,
           keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.mail, color: Colors.black54),
-            hintText: 'Correo',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(
-                  color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
-          ),
-          style: const TextStyle(color: Colors.black87),
         ),
         const SizedBox(height: 16.0),
 
-        // Campo de Contraseña
-        TextField(
-          controller: passwordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.lock, color: Colors.black54),
-            hintText: 'Contraseña',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(
-                  color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
-          ),
-          style: const TextStyle(color: Colors.black87),
+        // --- Campo de Contraseña (con alternancia) ---
+        _buildPasswordField(
+          controller: _passwordController,
+          hintText: 'Contraseña',
+          isVisible: _isPasswordVisible,
+          onToggleVisibility: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
         ),
         const SizedBox(height: 16.0),
 
-        // Campo de Confirmar Contraseña
-        TextField(
-          controller: confirmPasswordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.lock, color: Colors.black54),
-            hintText: 'Confirmar Contraseña',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(
-                  color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
-          ),
-          style: const TextStyle(color: Colors.black87),
+        // --- Campo de Confirmar Contraseña (con alternancia) ---
+        _buildPasswordField(
+          controller: _confirmPasswordController,
+          hintText: 'Confirmar Contraseña',
+          isVisible: _isConfirmPasswordVisible,
+          onToggleVisibility: () {
+            setState(() {
+              _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+            });
+          },
         ),
 
         // Mensaje de Error
@@ -117,30 +87,30 @@ class RegisterForm extends StatelessWidget {
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
               viewModel.errorMessage!,
-              style: const TextStyle(
-                  color: Colors.red, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),
 
         const SizedBox(height: 24.0),
 
-        // Botones de acción (Row modificado)
+        // --- Botón de Registrarse ---
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: viewModel.isLoading
                 ? null
                 : () {
-              viewModel.register(
-                nameController.text,
-                emailController.text,
-                passwordController.text,
-                confirmPasswordController.text,
+              // Usamos context.read (no escucha) para llamar a la función de registro
+              context.read<RegisterViewModel>().register(
+                _nameController.text,
+                _emailController.text,
+                _passwordController.text,
+                _confirmPasswordController.text,
                 context,
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromRGBO(104, 36, 68, 1),
+              backgroundColor: primaryColor,
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
@@ -159,17 +129,15 @@ class RegisterForm extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 10.0), // Espacio entre el botón y el texto
+        const SizedBox(height: 10.0),
 
-        // --- Enlace de texto (Leyenda secundaria) ---
+        // --- Enlace de texto (Iniciar Sesión) ---
         TextButton(
           onPressed: viewModel.isLoading
               ? null
               : () {
-            // Vuelve a la pantalla de Login
             Navigator.of(context).pop();
           },
-          // Leyenda
           child: Text(
             'Si ya se ha registrado, iniciar sesión',
             style: TextStyle(
@@ -180,6 +148,69 @@ class RegisterForm extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildStandardTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    required TextInputType keyboardType,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[200],
+        prefixIcon: Icon(icon, color: Colors.black54),
+        hintText: hintText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: const BorderSide(color: primaryColor, width: 2.0),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+      ),
+      style: const TextStyle(color: Colors.black87),
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String hintText,
+    required bool isVisible,
+    required VoidCallback onToggleVisibility,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: !isVisible,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[200],
+        prefixIcon: const Icon(Icons.lock, color: Colors.black54),
+        hintText: hintText,
+        suffixIcon: IconButton(
+          icon: Icon(
+            isVisible ? Icons.visibility : Icons.visibility_off,
+            color: Colors.black54,
+          ),
+          onPressed: onToggleVisibility,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: const BorderSide(color: primaryColor, width: 2.0),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+      ),
+      style: const TextStyle(color: Colors.black87),
     );
   }
 }
