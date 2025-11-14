@@ -31,7 +31,8 @@ class RegisterForm extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
+              borderSide: const BorderSide(
+                  color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
           ),
@@ -54,7 +55,8 @@ class RegisterForm extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
+              borderSide: const BorderSide(
+                  color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
           ),
@@ -77,7 +79,8 @@ class RegisterForm extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
+              borderSide: const BorderSide(
+                  color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
           ),
@@ -100,7 +103,8 @@ class RegisterForm extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
+              borderSide: const BorderSide(
+                  color: Color.fromRGBO(104, 36, 68, 1), width: 2.0),
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
           ),
@@ -113,60 +117,67 @@ class RegisterForm extends StatelessWidget {
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
               viewModel.errorMessage!,
-              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),
 
         const SizedBox(height: 24.0),
 
-        // Botones de acción
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              child: ElevatedButton(
-                onPressed: viewModel.isLoading
-                    ? null
-                    : () {
-                  viewModel.register(
-                    nameController.text,
-                    emailController.text,
-                    passwordController.text,
-                    confirmPasswordController.text,
-                    context,
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(104, 36, 68, 1),
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                child: viewModel.isLoading
-                    ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                )
-                    : const Text(
-                  'Registrarse',
-                  style: TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
+        // Botones de acción (Row modificado)
+        SizedBox(
+          width: double.infinity, // Asegura que el botón ocupe todo el ancho disponible
+          child: ElevatedButton(
+            onPressed: viewModel.isLoading
+                ? null
+                : () {
+              viewModel.register(
+                nameController.text,
+                emailController.text,
+                passwordController.text,
+                confirmPasswordController.text,
+                context,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromRGBO(104, 36, 68, 1),
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
               ),
             ),
-            const SizedBox(width: 16.0),
-            TextButton(
-              onPressed: viewModel.isLoading ? null : () => viewModel.goToLogin(context),
-              child: Text(
-                'Iniciar Sesión',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.grey[700],
-                ),
-              ),
+            child: viewModel.isLoading
+                ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+            )
+                : const Text(
+              'Registrarse',
+              style: TextStyle(fontSize: 18.0, color: Colors.white),
             ),
-          ],
+          ),
+        ),
+
+        const SizedBox(height: 10.0), // Espacio entre el botón y el texto
+
+        // --- Enlace de texto (Leyenda secundaria) ---
+        TextButton(
+          onPressed: viewModel.isLoading
+              ? null
+              : () {
+            // Vuelve a la pantalla de Login
+            Navigator.of(context).pop();
+          },
+          // Leyenda
+          child: Text(
+            'Si ya se ha registrado, iniciar sesión',
+            style: TextStyle(
+              fontSize: 14.0,
+              color: Colors.grey[700],
+              decoration: TextDecoration.underline, // Opcional: Subrayar para indicar que es un enlace
+            ),
+          ),
         ),
       ],
     );
