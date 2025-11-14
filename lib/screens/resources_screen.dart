@@ -44,13 +44,6 @@ class ResourcesScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: primaryColor),
         elevation: 0,
         actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              backgroundColor: primaryColor,
-              child: Text('A', style: TextStyle(color: Colors.white)),
-            ),
-          )
         ],
       ),
       drawer: const CustomDrawer(),

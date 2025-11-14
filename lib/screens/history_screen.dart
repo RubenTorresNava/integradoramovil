@@ -42,13 +42,6 @@ class HistoryScreen extends StatelessWidget {
                     viewModelReader.fetchHistory();
                   },
           ),
-          const Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              backgroundColor: primaryColor,
-              child: Text('A', style: TextStyle(color: Colors.white)),
-            ),
-          )
         ],
       ),
       drawer: const CustomDrawer(),

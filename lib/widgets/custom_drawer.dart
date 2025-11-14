@@ -1,39 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // <-- 1. IMPORTAR PROVIDER
+import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({Key? key}) : super(key: key);
+  static const Color accentColor = Color.fromRGBO(240, 240, 240, 1);
+
+  // Helper para obtener iniciales (mejorado para manejar nombres completos)
+  String _getInitials(String name) {
+    if (name.isEmpty) return '?';
+    final parts = name.trim().split(' ').where((p) => p.isNotEmpty).toList();
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 1).toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // El color morado oscuro del diseño
     const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
-
     final authProvider = Provider.of<AuthProvider>(context);
 
-    // --- 2. Extraer los datos del usuario de forma segura ---
-    // Usamos '??' para poner valores por defecto mientras carga
-    final String nombreUsuario = authProvider.user?.nombre ?? 'Cargando...';
+    // --- Extracción de datos (sin cambios) ---
+    final String nombreCompleto = authProvider.user?.nombre ?? 'Cargando Usuario';
     final String emailUsuario = authProvider.user?.email ?? '...';
-    final String inicialUsuario = authProvider.user?.nombre.isNotEmpty == true
-        ? authProvider.user!.nombre[0].toUpperCase()
-        : '?';
+    // Usamos el helper mejorado
+    final String iniciales = _getInitials(nombreCompleto);
 
     return Drawer(
-      width: 250, // Ancho fijo para el drawer
+      // Ya tiene width: 70%
+      width: MediaQuery.of(context).size.width * 0.57,
       backgroundColor: primaryColor,
       child: Column(
         children: <Widget>[
-          // Header de la app (oculta el icono de menú)
-          const DrawerHeader(
-            padding: EdgeInsets.zero,
-            child: SizedBox(height: 50.0), // Espacio para la parte superior
+          // --- 1. Encabezado COMPACTO ---
+          SafeArea(
+            child: Container(
+              color: primaryColor,
+              // Reducir la altura a 80 o menos
+              height: 80,
+              alignment: Alignment.centerLeft,
+              child: const Padding(
+                padding: EdgeInsets.only(left: 16.0, top: 8.0), // Ajustar padding superior
+                child: Text(
+                  'Menú',
+                  style: TextStyle(
+                    color: accentColor,
+                    fontSize: 22, // Ligeramente más pequeño
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           ),
 
-          // Lista de elementos de navegación
+          // --- Opciones de Navegación (Compactadas) ---
           ListTile(
-            leading: const Icon(Icons.add, color: Colors.white, size: 30),
+            // ** CLAVE: Reducir el contentPadding **
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            leading: const Icon(Icons.add, color: Colors.white, size: 24), // Icono más pequeño
             title: Text(
               'Inicio',
               style: TextStyle(
@@ -41,14 +66,16 @@ class CustomDrawer extends StatelessWidget {
                 fontWeight: ModalRoute.of(context)?.settings.name == '/home' ? FontWeight.bold : FontWeight.normal,
               ),
             ),
+            visualDensity: VisualDensity.compact, // Opcional: Aún más compacto
             onTap: () {
-              // Lógica de navegación a Inicio (ya estamos aquí, se puede cerrar el drawer)
               Navigator.pop(context);
               Navigator.of(context).pushNamed('/home');
             },
           ),
+
           ListTile(
-            leading: const Icon(Icons.history, color: Colors.white70),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            leading: const Icon(Icons.history, color: Colors.white70, size: 24),
             title: Text(
               'Historial',
               style: TextStyle(
@@ -56,13 +83,16 @@ class CustomDrawer extends StatelessWidget {
                 fontWeight: ModalRoute.of(context)?.settings.name == '/history' ? FontWeight.bold : FontWeight.normal,
               ),
             ),
+            visualDensity: VisualDensity.compact,
             onTap: () {
-              Navigator.pop(context); // Cierra el drawer
-              Navigator.of(context).pushNamed('/history'); // Navega a la pantalla
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/history');
             },
           ),
+
           ListTile(
-            leading: const Icon(Icons.auto_stories, color: Colors.white70),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            leading: const Icon(Icons.auto_stories, color: Colors.white70, size: 24),
             title: Text(
               'Recursos',
               style: TextStyle(
@@ -70,38 +100,64 @@ class CustomDrawer extends StatelessWidget {
                 fontWeight: ModalRoute.of(context)?.settings.name == '/resources' ? FontWeight.bold : FontWeight.normal,
               ),
             ),
+            visualDensity: VisualDensity.compact,
             onTap: () {
-              // Lógica para navegar a Recursos
-              Navigator.pop(context); // Cierra el drawer
-              Navigator.of(context).pushNamed('/resources'); // Navega a la pantalla
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/resources');
             },
           ),
 
-          const Spacer(), // Empuja el siguiente elemento al final
+          const Spacer(), // Empuja el contenido restante (usuario) al final
 
-          // Icono de usuario (Adaptado de la esquina superior derecha)
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.white,
-              // Muestra la inicial del usuario
-              child: Text(inicialUsuario,
-                  style: const TextStyle(
-                      color: primaryColor, fontWeight: FontWeight.bold)),
-            ),
-            // Muestra el nombre real
-            title: Text(nombreUsuario,
-                style: const TextStyle(color: Colors.white)),
-            // Muestra el email real
-            subtitle: Text(emailUsuario,
-                style: const TextStyle(color: Colors.white70, fontSize: 12)),
-
+          // --- Información del Usuario (Parte inferior) ---
+          InkWell(
             onTap: () {
-              // La lógica de Logout (no cambia)
-              Navigator.pop(context);
-              authProvider.logout();
+              // Lógica de Logout
+              Navigator.pop(context); // Cierra el Drawer
+              authProvider.logout(); // Llama a la función de Logout del Provider
+
+              // Navega a la ruta inicial ('/') y elimina todas las rutas anteriores
               Navigator.of(context).pushNamedAndRemoveUntil(
                   '/', (Route<dynamic> route) => false);
             },
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20.0, left: 16.0, right: 16.0, top: 10.0), // Agregué un padding superior para hacer el área de tap más grande
+              child: Row(
+                children: <Widget>[
+                  // Avatar con Iniciales
+                  CircleAvatar(
+                    backgroundColor: accentColor,
+                    child: Text(
+                      iniciales,
+                      style: const TextStyle(
+                          color: primaryColor, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+
+                  // Columna de texto (Expandida para truncar nombres largos)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          nombreCompleto,
+                          style: const TextStyle(color: accentColor, fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        Text(
+                          emailUsuario,
+                          style: const TextStyle(color: accentColor, fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
