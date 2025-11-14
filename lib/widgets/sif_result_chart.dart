@@ -102,7 +102,7 @@ class SifResultChart extends StatelessWidget {
                   isCurved: true,
                   color: primaryColor.withOpacity(0.7),
                   barWidth: 3,
-                  dotData:  FlDotData(show: false),
+                  dotData: const FlDotData(show: false),
                   belowBarData: BarAreaData(show: false),
                 ),
 
