@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart'; // <-- 1. Importar Provider
-import '../providers/auth_provider.dart'; // <-- 2. Importar AuthProvider
-import '../config/api_config.dart'; // Importar la configuración
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../config/api_config.dart';
+
+// --- MODELOS DE DATOS ---
 
 class CrackInput {
   String id = UniqueKey().toString();
@@ -21,13 +23,13 @@ class SifPredictorViewModel extends ChangeNotifier {
 
   final AuthProvider _authProvider;
 
-  // --- 5. CONSTRUCTOR MODIFICADO ---
-  // Ahora "recibe" el AuthProvider que 'main.dart' le inyecta
+  // --- CONSTRUCTOR MODIFICADO ---
   SifPredictorViewModel({required AuthProvider authProvider})
       : _authProvider = authProvider;
 
   // --- ESTADO ---
   final List<CrackInput> _crackInputs = [CrackInput()];
+  List<List<double>> _sifCurveData = []; // NUEVO: Datos para dibujar la curva [Tamaño, SIF]
 
   double? _sifResult;
   bool _isLoading = false;
@@ -36,6 +38,7 @@ class SifPredictorViewModel extends ChangeNotifier {
 
   // --- GETTERS ---
   List<CrackInput> get crackInputs => _crackInputs;
+  List<List<double>> get sifCurveData => _sifCurveData; // Getter de la curva
   double? get sifResult => _sifResult;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -74,6 +77,7 @@ class SifPredictorViewModel extends ChangeNotifier {
   void clearInput() {
     _crackInputs.clear();
     _crackInputs.add(CrackInput());
+    _sifCurveData = []; // Limpiar la curva
     _sifResult = null;
     _errorMessage = null;
     notifyListeners();
@@ -82,7 +86,7 @@ class SifPredictorViewModel extends ChangeNotifier {
   // --- LÓGICA DE CONEXIÓN A LA API ---
 
   Future<void> calculateSIF() async {
-    // Validaciones
+    // 1. Validaciones
     if (_crackInputs.any((input) => input.size == null || input.size! <= 0 || input.shape == null)) {
       _errorMessage = 'Asegúrate de que todos los campos (Forma y Tamaño) estén llenos y sean válidos.';
       _sifResult = null;
@@ -90,76 +94,71 @@ class SifPredictorViewModel extends ChangeNotifier {
       return;
     }
 
-    // --- 6. Obtener el token ANTES de empezar ---
     final token = _authProvider.token;
     if (token == null) {
-      _errorMessage =
-          'Error de autenticación. Por favor, inicia sesión de nuevo.';
+      _errorMessage = 'Error de autenticación. Por favor, inicia sesión de nuevo.';
       notifyListeners();
-      // (El Consumer en main.dart probablemente ya te habría redirigido)
       return;
     }
 
     _isLoading = true;
     _errorMessage = null;
     _sifResult = null;
-    notifyListeners();
+    _sifCurveData = []; // Limpiar antes de la petición
 
-    // Limpiar resultados anteriores en la lista
     for (var input in _crackInputs) {
       input.result = null;
     }
     notifyListeners();
 
     try {
-      // Preparar los datos
-      final features = _crackInputs.map((input) => input.size).toList();
-      final body = jsonEncode({'features': features});
-      final url = Uri.parse(_predUrl);
+      // 2. Preparar los datos
+      final primaryInput = _crackInputs.first;
 
-      // Petición HTTP POST
+      final Map<String, dynamic> requestBody = {
+        'features': _crackInputs.map((input) => input.size).toList(),
+        'crack_shape': primaryInput.shape,
+        'generate_curve': true,
+      };
+
+      // Petición HTTP POST a la API de Predicción (que devuelve la curva y los puntos)
       final response = await http.post(
-        url,
+        Uri.parse(_predUrl),
         headers: {'Content-Type': 'application/json'},
-        body: body,
+        body: jsonEncode(requestBody),
       ).timeout(const Duration(seconds: 10));
 
       // 4. Procesar la Respuesta
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final List<dynamic> predictions = data['predictions'];
-        final List<double> sifValues = []; // Guardamos los valores numéricos
+        final List<dynamic> curveData = data['curve_points'] ?? [];
 
-        // Asignar resultados individuales
+        final List<double> sifValues = [];
+
+        // A. Asignar resultados individuales (Puntos)
         for (int i = 0; i < predictions.length; i++) {
           if (i < _crackInputs.length) {
-            // Se asume que predictions[i] contiene el valor numérico
             final double sifValue = (predictions[i][0] as num).toDouble();
-
-            // Almacenar el resultado formateado con ' MPa' en el input individual
             _crackInputs[i].result = '${sifValue.toStringAsFixed(2)} MPa';
-
             sifValues.add(sifValue);
-            
           }
         }
 
-        _errorMessage = null;
-        notifyListeners();
+        // B. Almacenar los datos de la curva (Línea)
+        if (curveData.isNotEmpty) {
+          _sifCurveData = curveData.map((point) =>
+          [ (point[0] as num).toDouble(), (point[1] as num).toDouble() ]
+          ).toList();
+        }
 
-        // --- PASO 3: LLAMADA A LA API DE FASTAPI (:8000) ---
+        // --- LLAMADA A LA API DE FASTAPI para guardar los datos ---
         print("LOG API-FASTAPI: Guardando ${sifValues.length} resultados...");
 
-        // TODO: Estos IDs (1 y 1) son fijos.
-        // Deberías tener una lógica para que el usuario seleccione
-        // el 'modelo' y 'geometria' y obtener sus IDs reales.
         const int modeloId = 1;
         const int geometriaId = 1;
 
-        // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
-        // Usamos List.generate para iterar de forma segura con un índice
         final calculoBody = jsonEncode(List.generate(sifValues.length, (index) {
-          // Obtenemos los valores de cada lista usando el mismo índice
           final double sifValor = sifValues[index];
           final double? entradaGrieta = _crackInputs[index].size;
 
@@ -170,39 +169,35 @@ class SifPredictorViewModel extends ChangeNotifier {
             'valor_salida_esfuerzo': sifValor,
             'plataforma': "movil"
           };
-        }) // .toList() no es necesario, List.generate ya devuelve una lista
-            );
-        // --- FIN DE LA CORRECCIÓN ---
+        }));
 
         final fastApiUrl = Uri.parse('$_apiUrl/calculos/batch');
         final responseFastAPI = await http
             .post(
-              fastApiUrl,
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer $token' // ¡Usamos el token!
-              },
-              body: calculoBody,
-            )
+          fastApiUrl,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token'
+          },
+          body: calculoBody,
+        )
             .timeout(const Duration(seconds: 10));
 
-            if (responseFastAPI.statusCode == 201) {
-          // ¡Guardado con éxito!
+        if (responseFastAPI.statusCode == 201) {
           print("LOG API-FASTAPI: Lote de cálculos guardado exitosamente.");
         } else if (responseFastAPI.statusCode == 401) {
-          // Token expirado
-          _errorMessage =
-              "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.";
-          _authProvider.logout(); // Limpiamos la sesión
+          _errorMessage = "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.";
+          _authProvider.logout();
         } else {
-          // Otro error de guardado
           print("LOG API-FASTAPI: Error al guardar ${responseFastAPI.body}");
-          _errorMessage =
-              "No se pudieron guardar los resultados (Código ${responseFastAPI.statusCode})";
+          _errorMessage = "No se pudieron guardar los resultados (Código ${responseFastAPI.statusCode})";
         }
 
+        _errorMessage = null;
+        notifyListeners();
+
       } else {
-        // Manejar errores del servidor
+        // Manejar errores de la API de Predicción
         try {
           final errorData = jsonDecode(response.body);
           _errorMessage = errorData['error'] ?? errorData['message'] ?? 'Error del servidor: ${response.statusCode}';

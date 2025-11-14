@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import '../widgets/custom_drawer.dart';
 import '../widgets/predictor_input_panel.dart';
 import '../widgets/home_bottom_nav.dart';
+import '../widgets/sif_result_chart.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   static const Color primaryColor = Color.fromRGBO(104, 36, 68, 1);
 
-  // Widget del área de la gráfica (contenedor gris)
+// Widget del área de la gráfica (contenedor gris)
   Widget _buildGraphArea() {
     return Container(
       margin: const EdgeInsets.all(16.0),
@@ -18,14 +19,10 @@ class HomeScreen extends StatelessWidget {
           border: Border.all(color: Colors.grey.shade300)
       ),
       alignment: Alignment.center,
-      child: const Text(
-        'Gráfica de Esfuerzos / Resultados aquí',
-        textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.grey, fontSize: 16),
-      ),
+      // ** CAMBIO CLAVE: Usamos el widget de la gráfica **
+      child: const SifResultChart(),
     );
   }
-
   // Widget de la barra de navegación inferior
   Widget _buildBottomNavigation() {
     return const HomeBottomNav(primaryColor: primaryColor);
