@@ -1,4 +1,3 @@
-// lib/main.dart (MODIFICADO)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +10,7 @@ import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/resources_screen.dart';
 import 'screens/history_screen.dart';
+import 'screens/coming_soon_screen.dart';
 import 'viewmodels/login_viewmodel.dart';
 import 'viewmodels/register_viewmodel.dart';
 import 'viewmodels/sif_predictor_viewmodel.dart';
@@ -93,7 +93,7 @@ class MyApp extends StatelessWidget {
             '/home': (context) => const HomeScreen(),
             '/resources': (context) => const ResourcesScreen(),
             '/history': (context) => const HistoryScreen(),
-            // ... (Deberías añadir '/user' aquí si tienes una página de perfil)
+            '/coming_soon': (context) => const ComingSoonScreen(),
           },
         ),
       ),

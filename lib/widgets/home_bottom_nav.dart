@@ -5,17 +5,26 @@ import '../viewmodels/sif_predictor_viewmodel.dart';
 class HomeBottomNav extends StatelessWidget {
   final Color primaryColor;
 
-  const HomeBottomNav({super.key, required this.primaryColor});
+  const HomeBottomNav({Key? key, required this.primaryColor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Escucha el ViewModel
     final viewModel = Provider.of<SifPredictorViewModel>(context);
 
-    // Estas propiedades fueron conservadas en el ViewModel y funcionan
     return BottomNavigationBar(
       currentIndex: viewModel.selectedTabIndex,
-      onTap: viewModel.selectTab,
+      onTap: (index) {
+        if (index == 0) {
+          viewModel.selectTab(index);
+        } else {
+
+          Navigator.of(context).pushNamed('/coming_soon');
+
+          if (viewModel.selectedTabIndex != 0) {
+            viewModel.selectTab(0);
+          }
+        }
+      },
       selectedItemColor: primaryColor,
       unselectedItemColor: Colors.grey,
       selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
