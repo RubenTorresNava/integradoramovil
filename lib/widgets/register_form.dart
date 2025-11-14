@@ -126,7 +126,7 @@ class RegisterForm extends StatelessWidget {
 
         // Botones de acción (Row modificado)
         SizedBox(
-          width: double.infinity, // Asegura que el botón ocupe todo el ancho disponible
+          width: double.infinity,
           child: ElevatedButton(
             onPressed: viewModel.isLoading
                 ? null
@@ -175,7 +175,7 @@ class RegisterForm extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.0,
               color: Colors.grey[700],
-              decoration: TextDecoration.underline, // Opcional: Subrayar para indicar que es un enlace
+              decoration: TextDecoration.underline,
             ),
           ),
         ),
