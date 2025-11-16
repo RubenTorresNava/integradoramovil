@@ -6,13 +6,13 @@ class ApiConfig {
   // --- 1. API DE FASTAPI (PRODUCCIÓN) ---
   // ¡Felicidades! Esta URL es ahora pública y siempre será la misma.
   // Ya no necesitamos lógica de localhost/emulador para esto.
-  static const String fastApiBaseUrl = 'https://prefis-api.onrender.com';
+  static const String fastApiBaseUrl = 'http://192.168.1.6:8000';
 
   // --- 2. API DE MACHINE LEARNING (LOCAL) ---
 
   // Esta es la IP de tu PC en la red WiFi que nos diste.
   // Es la ÚNICA LÍNEA que debes cambiar si tu WiFi te da una IP nueva.
-  static const String predApiBaseUrl = 'https://eyeable-receptually-nicholle.ngrok-free.dev';
+  static const String predApiBaseUrl = 'http://192.168.1.6:8000';
 
 /*   // IPs especiales para emuladores/simuladores
   static const String _androidEmulatorIp = '10.0.2.2';

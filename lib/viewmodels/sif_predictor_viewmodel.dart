@@ -17,7 +17,7 @@ class CrackInput {
 
 class SifPredictorViewModel extends ChangeNotifier {
   // --- CONSTANTE: URL DE TU API ---
-  final String _predUrl = '${ApiConfig.predApiBaseUrl}/predict';
+  final String _predUrl = '${ApiConfig.predApiBaseUrl}/predict_grieta/';
   final String _apiUrl = ApiConfig.fastApiBaseUrl;
 
   final AuthProvider _authProvider;
