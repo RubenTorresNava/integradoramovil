@@ -62,11 +62,11 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ],
-
       // --- 3. ENVOLVER MATERIALAPP EN UN CONSUMER ---
       // Esto hace que MaterialApp se reconstruya cuando el estado de 'auth' cambie
       child: Consumer<AuthProvider>(
         builder: (context, auth, _) => MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'PREFIS SIF Predictor',
           theme: ThemeData(
             primarySwatch: Colors.purple,
